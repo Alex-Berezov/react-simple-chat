@@ -1,10 +1,12 @@
 const express = require('express');
+const path = require('path');
 
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'build')));
 
 const rooms = new Map();
 
@@ -62,7 +64,13 @@ io.on('connection', (socket) => {
   console.log('user connected', socket.id);
 });
 
-server.listen(9999, (err) => {
+app.get('*', (req,res) =>{
+  res.sendFile(path.join(__dirname+'/build/index.html'));
+});
+
+const port = process.env.PORT || 9999;
+
+server.listen(port, (err) => {
   if (err) {
     throw Error(err);
   }
